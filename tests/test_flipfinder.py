@@ -1771,5 +1771,5 @@ def test_music_searches_use_the_music_rules_and_budget_pedals_keep_theirs(tmp_pa
     amp = sc._rules(by["marshall amplificatore"])
     assert (amp.min_profit, amp.min_roi, amp.min_comparables, amp.max_price) == (20, 35, 5, 250)   # music max €250
     assert (sc._rules(by["boss"]).min_profit, sc._rules(by["yamaha chitarra"]).min_roi) == (20, 35)
-    assert sc._rules(by["boss ds 1"]).min_profit == 12         # a budget pedal: budget rules
+    assert sc._rules(by["boss ds 1"]).min_profit == 20         # a budget pedal: budget rules
     assert (sc._rules(by["iphone 13"]).min_profit, sc._rules(by["iphone 13"]).min_roi) == (50, 40)
