@@ -121,7 +121,7 @@ def apply_settings(cfg, settings: dict):
         if name in RULES:
             setattr(cfg.rules, name, RULES[name][0](value))
     cfg.rules.repairs = settings.get("repairs", True) is not False   # /repairs on|off (on unless turned off)
-    cfg.rules.abroad = settings.get("abroad") is True                  # /abroad on|off (Italy only unless turned on)
+    cfg.rules.abroad = settings.get("abroad", cfg.rules.abroad) is True  # config default, unless overridden by /abroad
     # applied from a report's suggestions (✅ Apply): music minimums, and values per category or search
     cfg.music_rules = {**cfg.music_rules, **{k: float(v) for k, v in (settings.get("music_rules") or {}).items()
                                              if k in ("min_profit", "min_roi", "max_price")}}
