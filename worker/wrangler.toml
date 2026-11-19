@@ -14,7 +14,7 @@ crons = ["*/5 * * * *", "7 * * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "flipfinder"
-database_id = "befd91af-75b3-4d87-832f-96174c98d4be"
+database_id = "86639079-8589-4b31-9dff-446f825dd3c5"
 
 # Secrets (set with `npx wrangler secret put NAME`, never committed):
 #   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, OWNER_ID, API_KEY, WEBHOOK_SECRET
