@@ -145,15 +145,15 @@ def test_the_deal_card():
     assert "HDD only" in text and "📶" not in text
 
 
-def test_searches_electronics_topic_italy_only_and_not_in_the_fast_lane():
+def test_searches_electronics_topic_configured_regions_and_not_in_the_fast_lane():
     cfg = config.load()
     pcs = [s for s in cfg.searches if s.model == "pc"]
     assert len(pcs) == 9 and {search_group(s) for s in pcs} == {"Electronics"}
     assert {s.max_price for s in pcs} == {300}
     sc = Scanner(cfg)
     r = sc._rules(next(s for s in pcs if s.query == "pc gaming"))
-    assert (r.model, r.pc_form, r.abroad, r.repairs, r.max_price, r.pc_ship_min) == ("pc", "desktop", False, False, 300, 15)
-    assert (r.min_profit, r.min_roi) == (30, 25)                         # PCs' own rules (config pc:)
+    assert (r.model, r.pc_form, r.abroad, r.repairs, r.max_price, r.pc_ship_min) == ("pc", "desktop", True, False, 300, 15)
+    assert (r.min_profit, r.min_roi) == (20, 25)                         # PCs' own rules (config pc:)
     assert sc._rules(next(s for s in pcs if s.query == "notebook gtx")).pc_form == "laptop"
     assert sc._ebay_category(pcs[0]) == 179 and sc._subito_category(pcs[0]) == 10
     fs = {**fastlane.DEFAULTS, "groups": ["Electronics"]}
@@ -172,7 +172,7 @@ def test_the_scan_reads_specs_opens_a_few_asks_the_ai_and_skips_abroad(tmp_path,
     sc.first_run = False
     sc.pc_stats = new_pc_stats()
     sold_list = [sold(100 + n, p, "PC i5 10400F GTX 1660 Super 16GB") for n, p in enumerate((290, 300, 310, 320))]
-    rules = replace(sc._rules(s), sold=sold_list, min_rating=1)
+    rules = replace(sc._rules(s), sold=sold_list, min_rating=1, abroad=False)
     fresh = [it(1, 150, "PC i5-6600K GTX 750 Ti 16 GB SSD 512"),           # weak card in the title: never opened
              it(2, 150, "PC gaming i5 9400F GTX 1660 Super"),               # opened, the AI finds RAM and SSD
              it(3, 140, "Pc gaming"),                                       # no card in the title: last, waits
