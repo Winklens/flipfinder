@@ -170,4 +170,4 @@ def test_config_settings_and_scanner_rules(tmp_path):
     assert rep.query == "margiela gat" and rep.filters == {} and rep.group == "Clothes"   # Vinted blocks "replica" searches
     assert "replica" not in rr.fake_words and "replica" in rules.fake_words and rr.model == "replica"
     assert not rules.repairs
-    assert rules.abroad and not Scanner(cfg)._rules(cfg.searches[0]).abroad   # EU listings for clothes only
+    assert rules.abroad and Scanner(cfg)._rules(cfg.searches[0]).abroad   # EU listings enabled for all searches in this pilot
