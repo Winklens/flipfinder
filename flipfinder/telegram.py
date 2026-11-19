@@ -42,7 +42,7 @@ def format_deal(deal: Deal) -> str:
     platform = PLATFORMS.get(it.source, it.source)
     where = html.escape(it.location) + (f" ({it.distance_km:.0f} km)" if it.distance_km is not None else "")
     lines.append(f"🛒 <b>{platform}</b>" + (f" · {where}" if it.location else ""))
-    if it.country and it.country not in ("DE", "AT"):
+    if it.country and it.country not in (("DE", "AT") if "vinted.de" in it.url else ("IT",)):
         lines.append(abroad_line(it.country))
     if it.source == "subito" and it.delivery == "shipping" and it.location:
         lines.append(f"📦 <b>Ships from {html.escape(it.location)}</b>")
