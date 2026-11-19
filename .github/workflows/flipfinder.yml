@@ -53,7 +53,14 @@ jobs:
           EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
           EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
           REVERB_TOKEN: ${{ secrets.REVERB_TOKEN }}
-        run: python main.py --once
+        run: |
+          # This pilot scans only until 22 Nov 2026, 07:00 UTC.
+          # GitHub Actions schedules may still wake up after this date, but no scan will run.
+          if [ "$(date -u +%Y%m%d%H%M)" -ge "202611220700" ]; then
+            echo "3-day flipFinder pilot ended; skipping scan."
+            exit 0
+          fi
+          python main.py --once
 
       - uses: actions/cache/save@v4
         if: always()
