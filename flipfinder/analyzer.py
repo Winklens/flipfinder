@@ -71,7 +71,8 @@ class Rules:
     max_cost: float | None = None   # budget: price + fee + shipping/pickup (+ missing parts) must fit
     missing_part_cost: float = 0.0  # cameras: added when the listing says no battery/charger
     repairs: bool = True            # damaged listings we can fix become repair deals (/repairs on|off)
-    abroad: bool = False            # Vinted listings shipping from outside Italy (/abroad on|off)
+    abroad: bool = False            # allow Vinted offers outside the configured home countries
+    home_countries: tuple[str, ...] = ("IT",)  # from config.yaml; default remains Italy
     max_price: float | None = None  # main deals: the most we pay all in (/setrule max_price), budget has its own
     value_factor: float = 1.0       # a report suggestion applied: market value x this for the search's category
     budget: bool = False            # a budget-mode search (ranked by profit per euro spent)
@@ -534,7 +535,7 @@ _PROOF = re.compile(r"\b(scontrino|ricevuta|receipt|fattura|invoice|cartellin[oi
 RISK_LEVELS = ["low", "medium", "high"]
 
 
-def fake_risk(item: Item, value: float, model: str = "") -> tuple[str, list[str], str]:
+def fake_risk(item: Item, value: float, model: str = "", home_countries: tuple[str, ...] = ("IT",)) -> tuple[str, list[str], str]:
     """
     (shown level, why, base level). The base: how far under the market it is, the seller's history, how
     many photos there are, whether the seller mentions a receipt, tags or codes; at least medium from
@@ -542,7 +543,7 @@ def fake_risk(item: Item, value: float, model: str = "") -> tuple[str, list[str]
     checked the label photos (the AI does that from the photos).
     """
     level, why = _risk_points(item, value)
-    if item.country and item.country != HOME_COUNTRY and level == "low":
+    if item.country and item.country not in home_countries and level == "low":
         level = "medium"
         why.append("ships from abroad")
     if model == REPLICA:
@@ -840,9 +841,6 @@ MISSING_PART = re.compile(
     re.I)
 
 
-HOME_COUNTRY = "IT"
-
-
 def blocked_reasons(profit: float, roi: float, rating: int, rules: Rules,
                     cost: float | None = None) -> list[str]:
     """Which rules a listing fails, worded with the thresholds from config.yaml."""
@@ -903,7 +901,7 @@ def assess(item: Item, pool: list[Item], rules: Rules, query: str = "",
         return None
     if query and rules.model not in (REPLICA, "pc") and not is_relevant(item.title, query, item.brand):
         return None   # (the Replica search finds the model by its names, PCs by their specs instead)
-    if item.country and item.country != HOME_COUNTRY and not rules.abroad:
+    if item.country and item.country not in rules.home_countries and not rules.abroad:
         return None   # ships from abroad: off unless /abroad on
     fix = None
     text = f"{item.title}\n{item.description}"
@@ -976,7 +974,7 @@ def assess(item: Item, pool: list[Item], rules: Rules, query: str = "",
         trust = clothes_seller_block(item.seller, rules)
         if trust:
             blocked.append(trust)
-        risk, risk_why, risk_base = fake_risk(item, asking, rules.model)
+        risk, risk_why, risk_base = fake_risk(item, asking, rules.model, rules.home_countries)
     by_price = sorted(comps, key=lambda p: p.price)
     sample = [by_price[i * (n - 1) // 4] for i in range(5)]   # cheapest, quartiles, priciest
     deal = Deal(item, value, n, profit, roi, rating, basis, sample,
