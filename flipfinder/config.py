@@ -224,6 +224,8 @@ def load(path: str | Path = "config.yaml") -> Config:
         resell_costs=float(r.get("resell_costs", 0)),
         shipping_cost=float(r.get("shipping_cost", 15)),
         exclude_keywords=tuple(global_excl),
+        home_countries=tuple(str(c).upper() for c in (raw.get("home_countries") or ["IT"])),
+        abroad=bool(r.get("abroad", False)),
         # % and fixed fee you pay when you sell on each platform. Both are 0 for private
         # sellers: Vinted never charges sellers, eBay.it stopped for EEA private sellers in 2026.
         sell_fees={k: (float(v.get("percent", 0)), float(v.get("fixed", 0)))
