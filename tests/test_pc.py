@@ -172,7 +172,7 @@ def test_the_scan_reads_specs_opens_a_few_asks_the_ai_and_skips_abroad(tmp_path,
     sc.first_run = False
     sc.pc_stats = new_pc_stats()
     sold_list = [sold(100 + n, p, "PC i5 10400F GTX 1660 Super 16GB") for n, p in enumerate((290, 300, 310, 320))]
-    rules = replace(sc._rules(s), sold=sold_list, min_rating=1, abroad=False)
+    rules = replace(sc._rules(s), sold=sold_list, min_rating=1, abroad=False, home_countries=("IT",))
     fresh = [it(1, 150, "PC i5-6600K GTX 750 Ti 16 GB SSD 512"),           # weak card in the title: never opened
              it(2, 150, "PC gaming i5 9400F GTX 1660 Super"),               # opened, the AI finds RAM and SSD
              it(3, 140, "Pc gaming"),                                       # no card in the title: last, waits
