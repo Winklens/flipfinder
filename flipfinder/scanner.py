@@ -432,9 +432,9 @@ class Scanner:
             rules = replace(rules, max_price=float(s.max_price))
         if s.model and not s.clothes:
             rules = replace(rules, model=s.model)
-        if s.model == "pc":   # gaming PCs: Italy only, never repaired, valued on what the same combo sold for
+        if s.model == "pc":   # gaming PCs: no repairs; valued on what the same combo sold for
             pcs = getattr(self.cfg, "pc", None) or {}
-            rules = replace(rules, repairs=False, abroad=False, pc_form=pc_form(s),
+            rules = replace(rules, repairs=False, pc_form=pc_form(s),
                             min_profit=float(pcs.get("min_profit", rules.min_profit)),
                             min_roi=float(pcs.get("min_roi", rules.min_roi)),
                             pc_asking_factor=float(pcs.get("asking_factor") or 0),
@@ -717,7 +717,7 @@ class Scanner:
             d = self.client.details(item)
             out = {"shipping": d.shipping, "city": d.city,
                    "pickup_only": not d.shipping_available or is_pickup_only(f"{item.title}\n{d.description}")}
-            if pc.foreign(f"{item.title}\n{d.description}"):
+            if self.cfg.domain.endswith(".it") and pc.foreign(f"{item.title}\n{d.description}"):
                 item.country = "??"   # written in another language: from abroad, no need for the profile page
                 return pc.parse(item.title, d.description or "", "", form), {**out, "text": "", "attributes": ""}
             item.seller = self._vinted_seller(d)
@@ -752,7 +752,7 @@ class Scanner:
             first = pc.parse(item.title, item.description if item.source == "subito" else "", form=form)
             # what the title alone rules out (missing facts may still be in the description)
             fatal = [p for p in pc.problems(first) if p not in PC_OPEN_FACTS]
-            if item.source == "vinted" and pc.foreign(item.title):
+            if item.source == "vinted" and self.cfg.domain.endswith(".it") and pc.foreign(item.title):
                 fatal.append("abroad")   # a title in another language: from abroad, not worth a page
             st["found"] += 1
             if fatal:
@@ -775,7 +775,7 @@ class Scanner:
                 self._pc_skip(item, ["page didn't open"])
                 continue
             st["opened"] += 1
-            if item.country and item.country != "IT":
+            if item.country and item.country not in rules.home_countries and not rules.abroad:
                 self._pc_skip(item, ["abroad"])
                 continue
             opened.append((item, spec, how))
