@@ -1,6 +1,6 @@
 # flipFinder settings
 
-domain: www.vinted.it        # or www.vinted.fr, www.vinted.de, ...
+domain: www.vinted.de        # or www.vinted.fr, www.vinted.de, ...
 interval_minutes: 5          # only used when running on your PC (python main.py)
 request_delay: 2             # seconds between Vinted requests, don't go lower
 comparable_pages: 3          # pages of listings used to work out market value
@@ -11,14 +11,14 @@ stagger: true                # budget and guitar/amp/pedal searches take turns: 
 # The API allows 5,000 calls a day. Each eBay pass costs one call per search, and each
 # pool refresh another: 38 searches every 20 min + pools every 3 h = ~3,050 calls a day.
 ebay:
-  item_location: IT          # IT, or EU for items anywhere in the EU that ship to Italy
+  item_location: EU          # IT, or EU for items anywhere in the EU that ship to Italy
   interval_minutes: 20
   pool_refresh_minutes: 180
 
 # Subito.it, local pickup only: new listings in the province, kept if the town is within
 # radius_km of center. Market value uses Italy-wide Subito listings plus Vinted and eBay.
 subito:
-  enabled: true
+  enabled: false
   # the home area (region, province, center, radius, travel costs) is private: it lives in the
   # Worker's storage and each run reads it from there
   pool_refresh_minutes: 180
@@ -26,7 +26,7 @@ subito:
 # Budget mode (searches with `budget: true`): what you can spend per item, all in
 budget: 72
 budget_rules:
-  min_profit: 12
+  min_profit: 20
   min_roi: 35
   max_roi: 150               # far cheaper than this is usually a fake or broken
 
@@ -51,7 +51,7 @@ clothes:
   price_from: 20
   price_to: 200
   rules:                     # /setrule clothes min_profit 35 changes them from Telegram
-    min_profit: 30
+    min_profit: 20
     min_roi: 40
     min_rating: 5
   min_comparables: 6         # same brand + type + similar size listings needed for a market value
@@ -76,7 +76,7 @@ clothes:
 # republishing (deals go out without their photos), a User-Agent with a contact email (private, in the Worker).
 # Music searches only, a couple of pages a run in turn.
 mercatino:
-  enabled: true
+  enabled: false
   pages_per_run: 2
   daily_cap: 900
 
@@ -85,7 +85,7 @@ mercatino:
 # asking price of the same model and condition; profit assumes reselling on Reverb (fees ~8.2% + €0.49). Deals go
 # out without Reverb's photos, and Reverb prices only value Reverb deals (its API terms).
 reverb:
-  enabled: true
+  enabled: false
   searches_per_run: 6
   pool_pages: 2
 
@@ -93,7 +93,7 @@ reverb:
 # flipfinder/pc.py (GTX 1050 or better, RAM 8 GB+, SSD 240 GB+; less RAM or SSD = the upgrade on the cost), valued on
 # what the same form + graphics card + CPU tier sold for. Their own rules below, €300 max price (max_price on each search).
 pc:
-  min_profit: 30             # cheap PCs rarely leave the main €50
+  min_profit: 20             # cheap PCs rarely leave the main €50
   min_roi: 25
   pickup_km: 100             # Subito desktops for pickup: within this distance (a region, not just the province)
   desktop_ship_min: 15       # a tower by courier is a big heavy box: never counted cheaper than this
@@ -108,7 +108,7 @@ buyer_protection:
   percent: 5
 
 rules:
-  min_profit: 25       # € you'd make at least (gear is pricier, so higher than for clothes)
+  min_profit: 20       # € you'd make at least (gear is pricier, so higher than for clothes)
   min_roi: 30          # % profit compared to what you pay
   min_rating: 5        # out of 10 (6 blocked cheap items: full profit points need €50+)
   min_comparables: 8   # need this many similar listings to trust the market value
